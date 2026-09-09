@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use App\Traits\HasTranslit;
 use Illuminate\Database\Eloquent\Casts\Attribute as CastsAttribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Table(timestamps: false)]
 class Author extends Model
 {
-    use HasTranslit;
+    use HasTranslit, HasFactory;
 
     //public $timestamps = false;
 
