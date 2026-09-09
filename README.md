@@ -1,58 +1,40 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Book Catalog Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Учебный проект, демонстрирующий погружение в архитектуру фреймворка **Laravel**, оптимизацию высоконагруженных баз данных и работу с асинхронной архитектурой.
 
-## About Laravel
+## 🛠 Технологический стек
+* **Backend:** PHP 8.5, Laravel 13
+* **Databases:** MySQL 8.4
+* **Caching & Queues:** Redis, MySQL Queue Driver
+* **Testing:** PHPUnit
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Ключевой функционал и архитектурные решения
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Оптимизация БД и Eloquent ORM
+* **Оптимизация:** Для работы с таблицами высокой плотности отключены встроенные поля времени (`$timestamps = false`), что снижает нагрузку на память.
+* **Кастомные связи:** Реализовано переопределение стандартных конвенций Laravel с использованием кастомных внешних ключей (`bookId` и `authorId`).
+* **Связи Many-to-Many:** Настроена работа с Pivot-таблицами через методы `attach()` и `syncWithoutDetaching()` без ручного написания SQL-запросов. Используется безопасный массовый ввод через `$fillable`.
+* **Инкапсуляция логики (Scopes):** Реализованы локальные области видимости (Scopes) для инкапсуляции сложных SQL-запросов (включая `EXISTS` через `whereHas`).
 
-## Learning Laravel
+### 2. Фоновые процессы и Асинхронность (Queues & Redis)
+* Настроена и протестирована работа очередей на драйверах `database` и `Redis` (с учетом специфики изоляции IP в Open Server Panel 6).
+* Реализована асинхронная задача `ProcessBookView` для обновления счетчика просмотров без блокировки основного потока пользователя.
+* Изучена архитектура очередей изнутри: защита от потери задач (ACK / `:reserved`) и отложенный запуск через `delay()`.
+* Обработана отказоустойчивость CLI-команд: защита от дедлоков в БД и использование встроенного механизма повторных попыток задач (`$tries`).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. Архитектура приложения и Паттерны
+* **Repository & Service:** Бизнес-логика вынесена из контроллеров. Реализован паттерн *Repository* для низкоуровневых запросов через фасад `DB`, и *Service* — для ветвления логики поиска.
+* **Разделение обязанностей (Traits vs Classes):** Чистые функции (транслитерация) вынесены в изолированные утилиты, а логика моделей — в гибкие трейты с инициализацией через метод `booted()`.
+* **Dependency Injection:** Активно применяется сервис-контейнер Laravel и автоматическое разрешение зависимостей (Auto-wiring) через Type Hinting в контроллерах.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4. Маршрутизация, SEO и Полнотекстовый поиск
+* **SEO-маршруты:** Реализован универсальный SEO-маршрут для книг через регулярные выражения. Написана логика дешифровки путей, выполняющая автоматический `301-редирект` на каноничный URL при несоответствиях.
+* **Защита от N+1:** В каталоге книг внедрена жадная загрузка (*Eager Loading*) через `with('authors')` в связке со встроенной пагинацией.
+* **Full-Text Поиск:** Спроектирован сложный составной полнотекстовый индекс в миграциях MySQL. Поиск авторов переведен на режим `BOOLEAN MODE` с помощью `whereRaw()`.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 5. Безопасность, Blade и Тестирование
+* **Безопасность:** Внедрена и настроена защита форм от межсайтовой подделки запросов (CSRF) с помощью посредника `VerifyCsrfToken`.
+* **Blade:** Реализован полиморфный вывод данных (Книги/Авторы) в одном цикле с использованием `instanceof`. Кастомизированы системные шаблоны пагинации.
+* **Автоматическое тестирование:** Написаны функциональные (Feature) тесты на PHPUnit для проверки поисковой выдачи. Решена проблема конфликта SQLite (in-memory) с полнотекстовыми индексами MySQL с помощью мокирования / тестовой БД.
