@@ -68,11 +68,13 @@
 Через VS Code:
 	* Посмотри на файлы. В `git status` конфликтующие файлы будут помечены как `both modified`.
 	* Открой файл в VS Code. Ты увидишь специальную разметку Git, которая выглядит так:
-		```<<<<<<< Updated upstream
+		```
+        <<<<<<< Updated upstream
 		Новый код, который уже был в ветке (например, фикс бага)
 		=======
 		Старый код, который ты достал из заначки (stash)
-		>>>>>>> Stashed changes```
+		>>>>>>> Stashed changes
+        ```
 	* Выбери правильный вариант. Прямо над этими строками в VS Code появятся кликабельные кнопки-помощники:
 		`Accept Current Change` — оставить код, который был в ветке.
 		`Accept Incoming Change` — взять код из заначки.
@@ -84,17 +86,21 @@
 	* Очисти заначку: Так как из-за конфликта заначка осталась в памяти, удали её вручную, когда убедишься, что код восстановлен правильно: `git stash drop`
 * **Работа со слиянием веток:** `git merge <сливаемая-ветка>` Вызывать эту команду надо **находясь** на ветке **в** которую надо слить.
     * Произойдёт слияние веток. Если будет конфликт, то увидим:
-	```Auto-merging README.md
+	```
+    Auto-merging README.md
 	CONFLICT (content): Merge conflict in README.md
-	Automatic merge failed; fix conflicts and then commit the result.```
+	Automatic merge failed; fix conflicts and then commit the result.
+    ```
     Если ты введешь `git status`, ты увидишь, что файл README.md находится в статусе `both modified`.
     * Разметка конфликта:
     Если открыть README.md через обычный блокнот или посмотреть в консоли, то Git прямо в текст файла вставил специальные маркеры разделители:
-	    ```<<<<<<< HEAD
+	    ```
+        <<<<<<< HEAD
 	    Текст, который ты написал, находясь в ветке main
 	    =======
 	    Текст, который прилетел из ветки branch-learnings
-	    >>>>>>> branch-learnings```
+	    >>>>>>> branch-learnings
+        ```
     `<<<<<<< HEAD` — начало изменений из твоей текущей ветки (main).
     `=======` — граница между твоим и чужим кодом.
     `>>>>>>> <название-ветки>` — конец изменений, которые пришли из вливаемой ветки.
@@ -106,7 +112,8 @@
 	    `Compare changes` -
     Если не через VS CODE, то просто вручную стереть строчки с `<<<<<<< HEAD`, `=======` и `>>>>>>> branch-learnings`. Сформировать финальный текст. Оставить внутри файла вариант текста, который должен пойти в финальную версию проекта.
     Нажав `Accept Incoming Change`, при вызове статуса появится ещё строки:
-	```On branch main
+	```
+    On branch main
 	Your branch is ahead of 'origin/main' by 2 commits.
 	  (use "git push" to publish your local commits)
 
@@ -116,7 +123,8 @@
 
 	Unmerged paths:
 	  (use "git add <file>..." to mark resolution)
-        	both modified:   README.md```
+        	both modified:   README.md
+    ```
     * Завершение мерджа:
     `git add README.md` - После сохранения файла надо добавить исправленный файл в индекс.
     `git commit -m "Merge branch-learnings into main and fix conflicts"` - Сделать финальный коммит слияния.
